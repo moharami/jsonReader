@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCreditCardsTable extends Migration
+class CreateCreditTypesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,9 @@ class CreateCreditCardsTable extends Migration
      */
     public function up()
     {
-        Schema::create('credit_cards', function (Blueprint $table) {
+        Schema::create('credit_types', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('user_id');
-            $table->unsignedInteger('credit_type_id')->nullable();
-            $table->unsignedBigInteger('number');
-            $table->string('name');
-            $table->string('expirationDate');
+            $table->string('type')->unique();
             $table->timestamps();
         });
     }
@@ -31,6 +27,6 @@ class CreateCreditCardsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('credit_cards');
+        Schema::dropIfExists('credit_types');
     }
 }

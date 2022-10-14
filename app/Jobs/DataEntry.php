@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\CreditCard;
+use App\Models\CreditType;
 use App\Models\User;
 use http\Exception;
 use Illuminate\Bus\Queueable;
@@ -41,12 +42,12 @@ class DataEntry implements ShouldQueue
     {
         $content = file_get_contents(storage_path('challenge.json'));
         $users = json_decode($content, true);
-        
         foreach ($users as $key => $user) {
             DB::transaction(function () use ($user) {
-                $credit_card = new CreditCard($user['credit_card']);
-                $user = User::create($user);
-                $user->CreditCard()->save($credit_card);
+                $creditCard = $user['credit_card'];
+                $creditCard['credit_type_id'] = CreditType::firstOrCreate(['type' => $user['credit_card']['type']])->id;
+                $creditCard['user_id'] = User::create($user)->id;
+                CreditCard::create($creditCard);
             });
         }
     }

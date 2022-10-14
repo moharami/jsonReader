@@ -10,9 +10,10 @@ class CreditCard extends Model
     use HasFactory;
 
     protected $fillable = [
-        'type',
         'number',
         'name',
+        'user_id',
+        'credit_type_id',
         'expirationDate'
     ];
 
@@ -20,4 +21,10 @@ class CreditCard extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function credittype()
+    {
+        return $this->belongsTo(CreditType::class);
+    }
+
 }
