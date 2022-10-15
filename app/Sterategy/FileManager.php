@@ -2,7 +2,9 @@
 
 namespace App\Sterategy;
 
+use App\Sterategy\Driver\CsvTransfer;
 use App\Sterategy\Driver\JsonTransfer;
+use App\Sterategy\Driver\XmlTransfer;
 use Illuminate\Support\Manager;
 
 class FileManager extends Manager
@@ -24,5 +26,13 @@ class FileManager extends Manager
         return new JsonTransfer($this->fileName);
     }
 
+    protected function CreateCsvTransferDriver()
+    {
+        return new CsvTransfer($this->fileName);
+    }
 
+    protected function CreateXmlTransferDriver()
+    {
+        return new XmlTransfer($this->fileName);
+    }
 }

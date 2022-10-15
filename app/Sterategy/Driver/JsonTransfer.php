@@ -9,7 +9,7 @@ use App\Sterategy\Pointer;
 use Illuminate\Support\Facades\DB;
 use JsonMachine\Items;
 
-class JsonTransfer
+class JsonTransfer implements TransferInterface
 {
 
     private $users;
@@ -30,12 +30,12 @@ class JsonTransfer
         }
     }
 
-    protected function setUsers()
+    public function setUsers()
     {
         $this->users = Items::fromFile($this->file, ['debug' => true]);
     }
 
-    private function saveRecord($user)
+    public function saveRecord($user)
     {
         DB::transaction(function () use ($user) {
             $creditCard = $user->credit_card;
@@ -48,7 +48,7 @@ class JsonTransfer
     }
 
 
-    protected function needToSave(): bool
+    public function needToSave(): bool
     {
         return $this->users->getPosition() > $this->last;
     }
