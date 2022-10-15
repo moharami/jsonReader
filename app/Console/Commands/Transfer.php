@@ -4,8 +4,10 @@ namespace App\Console\Commands;
 
 use App\Jobs\DataEntry;
 use App\Models\User;
+use App\Sterategy\Pointer;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Storage;
 
 class Transfer extends Command
 {
@@ -22,6 +24,8 @@ class Transfer extends Command
      * @var string
      */
     protected $description = 'Transfer json file Into Mysql Database';
+
+    protected $line = '-----------------------------';
 
     /**
      * Create a new command instance.
@@ -40,23 +44,43 @@ class Transfer extends Command
      */
     public function handle()
     {
-        $line = '-----------------------------';
-        $this->line($line);
-        $this->info('Step 1: Fresh Migrate Dabatabse ');
-        $this->line($line);
-        $this->call('migrate:fresh');
 
-        $this->line($line);
-        $this->info('Step 2: Added DataEntry Job ');
-        $this->line($line);
-        DataEntry::dispatch();
-
-
-        $this->line($line);
-        $this->info('Step 3: Run Queue Worker');
-        $this->line($line);
-        $this->call('queue:work');
-        $this->info('Transfer Finished');
-
+        $this->migrateFresh();
+        $this->addJob();
+        $this->runJob();
+        $this->info('Finished');
     }
+
+    protected function migrateFresh(): void
+    {
+        $this->line($this->line);
+        if ($this->confirm('Do you want Fresh Migrate and reset pointer')) {
+            $this->info('Step : Fresh Migrate Dabatabse ');
+            $this->line($this->line);
+            $this->call('migrate:fresh');
+            Pointer::resetPointer();
+            $this->line($this->line);
+        }
+    }
+
+    protected function addJob(): void
+    {
+        $file = 'challenge.json';
+        $this->info($file);
+        $this->line($this->line);
+        $this->info('Step : Added DataEntry Job ');
+        $this->line($this->line);
+        DataEntry::dispatch($file);
+    }
+
+    protected function runJob(): void
+    {
+        if ($this->confirm('Do you Want To Run Queue')) {
+            $this->line($this->line);
+            $this->call('queue:work');
+        } else {
+            $this->info('Step : Run `php artisan queue:work`');
+        }
+    }
+
 }
